@@ -134,6 +134,10 @@ type Session struct {
 
 	// used to make sure gateway websocket writes do not happen concurrently
 	wsMutex sync.Mutex
+
+	// user defined function to track progress of an http request
+	// the function passed returns the remaining length of the buffer
+	RequestProgress func(func() int)
 }
 
 // Application stores values for a Discord Application

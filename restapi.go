@@ -198,10 +198,18 @@ func (s *Session) RequestWithLockedBucket(method, urlStr, contentType string, b 
 		log.Printf("API REQUEST  PAYLOAD :: [%s]\n", string(b))
 	}
 
-	req, err := http.NewRequest(method, urlStr, bytes.NewBuffer(b))
+	buff := bytes.NewBuffer(b)
+	req, err := http.NewRequest(method, urlStr, buff)
 	if err != nil {
 		bucket.Release(nil)
 		return
+	}
+
+	// start goroutine to the custom progress tracking method
+	if s.RequestProgress != nil {
+		go s.RequestProgress(func() int {
+			return buff.Len()
+		})
 	}
 
 	// Not used on initial login..
